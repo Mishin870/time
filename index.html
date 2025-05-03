@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Время игры</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .event-time {
+      font-size: 24px;
+      margin-top: 40px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+    .local-time {
+      font-size: 24px;
+      color: #666;
+      margin-top: 10px;
+    }
+    .timezone {
+      font-size: 20px;
+      color: #999;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="event-time" id="event-time">Загрузка...</div>
+  <div class="local-time">по вашему времени</div>
+  <div class="timezone" id="timezone-info"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Получаем параметры из URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const dateParam = urlParams.get('date');
+      const timeParam = urlParams.get('time');
+      const placeParam = urlParams.get('place') || ''; // Новый параметр места
+      
+      if (!dateParam || !timeParam) {
+        document.getElementById('event-time').textContent = 'Укажите дату и время в URL: ?date=YYYY-MM-DD&time=HH:MM&place=Название';
+        return;
+      }
+      
+      // Формируем дату в UTC
+      const utcDateTime = `${dateParam}T${timeParam}:00Z`;
+      const eventDate = new Date(utcDateTime);
+      
+      if (isNaN(eventDate.getTime())) {
+        document.getElementById('event-time').textContent = 'Некорректная дата или время';
+        return;
+      }
+      
+      // Показываем часовой пояс
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      document.getElementById('timezone-info').textContent = timeZone;
+      
+      // Форматируем вывод
+      updateTimeDisplay(eventDate, placeParam);
+      
+      // Обновляем каждую минуту
+      setInterval(() => updateTimeDisplay(eventDate, placeParam), 60000);
+    });
+    
+    function updateTimeDisplay(eventDate, place) {
+      const now = new Date();
+      const localEventDate = new Date(eventDate);
+      
+      // Форматируем время в 24-часовом формате
+      const hours = localEventDate.getHours().toString().padStart(2, '0');
+      const minutes = localEventDate.getMinutes().toString().padStart(2, '0');
+      const timeStr = `${hours}:${minutes}`;
+      
+      let dateStr;
+      const diffDays = Math.floor((localEventDate - now) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0 && localEventDate.getDate() === now.getDate()) {
+        dateStr = 'сегодня';
+      } else if (diffDays === 1 && localEventDate.getDate() === now.getDate() + 1) {
+        dateStr = 'завтра';
+      } else {
+        dateStr = localEventDate.toLocaleDateString('ru-RU', { month: 'long', day: 'numeric' });
+      }
+      
+      // Добавляем место проведения, если указано
+      const placeStr = place ? ` в ${place}` : '';
+      document.getElementById('event-time').textContent = `Игра ${dateStr} в ${timeStr}${placeStr}`;
+    }
+  </script>
+</body>
+</html>
