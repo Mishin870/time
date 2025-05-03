@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Время игры</title>
   <style>
     body {
@@ -10,22 +11,28 @@
       margin: 0 auto;
       padding: 20px;
       text-align: center;
+      -webkit-text-size-adjust: 100%;
     }
     .event-time {
-      font-size: 24px;
-      margin-top: 40px;
+      font-size: 7vw;
+      margin-top: 10vh;
       font-weight: bold;
       line-height: 1.4;
     }
     .local-time {
-      font-size: 24px;
+      font-size: 5vw;
       color: #666;
-      margin-top: 10px;
+      margin-top: 2vh;
     }
     .timezone {
-      font-size: 20px;
+      font-size: 4vw;
       color: #999;
-      margin-top: 5px;
+      margin-top: 1vh;
+    }
+    @media (min-width: 600px) {
+      .event-time { font-size: 42px; }
+      .local-time { font-size: 30px; }
+      .timezone { font-size: 24px; }
     }
   </style>
 </head>
@@ -40,7 +47,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const dateParam = urlParams.get('date');
       const timeParam = urlParams.get('time');
-      const placeParam = urlParams.get('place') || ''; // Новый параметр места
+      const placeParam = urlParams.get('place') || '';
       
       if (!dateParam || !timeParam) {
         document.getElementById('event-time').textContent = 'Укажите дату и время в URL: ?date=YYYY-MM-DD&time=HH:MM&place=Название';
